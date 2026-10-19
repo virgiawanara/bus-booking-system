@@ -31,6 +31,9 @@ export async function holdQuote(db: DB, args: HoldQuoteArgs): Promise<HoldResult
   const { quoteId, unitIds, holdHours, bufferHours = 2, now = new Date() } = args;
   if (unitIds.length === 0) return { ok: false, reason: 'Tidak ada unit yang dipilih' };
 
+  // Bersihkan lease yang sudah lewat supaya unit dapat ditahan lagi.
+  await sweepExpired(db, now);
+
   try {
     const until = await db.transaction(async (tx) => {
       const [q] = await tx.select().from(quotes).where(eq(quotes.id, quoteId)).for('update');
@@ -47,6 +50,7 @@ export async function holdQuote(db: DB, args: HoldQuoteArgs): Promise<HoldResult
       const occupiedUntil = new Date(q.endAt.getTime() + bufferHours * HOUR_MS);
 
       // Cek ramah (pesan enak dibaca). Hard guarantee tetap gist: no_overlap.
+      // Lease lewat (hold_until < now) diabaikan — akan ter-sweep.
       const clash = await tx
         .select({ id: holds.id })
         .from(holds)
@@ -55,6 +59,7 @@ export async function holdQuote(db: DB, args: HoldQuoteArgs): Promise<HoldResult
             inArray(holds.unitId, unitIds),
             gt(holds.occupiedUntil, occupiedFrom),
             lt(holds.occupiedFrom, occupiedUntil),
+            gt(holds.holdUntil, now),
           ),
         );
       if (clash.length > 0) throw new Error('Ada unit yang masih ditahan quote lain');

@@ -52,7 +52,7 @@ function fmtIDR(n: number) {
   return 'Rp' + new Intl.NumberFormat('id-ID').format(n);
 }
 
-export function BookingWizard({ poName }: { poName: string }) {
+export function BookingWizard() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(initialState);
   const [loading, setLoading] = useState(false);
@@ -60,9 +60,7 @@ export function BookingWizard({ poName }: { poName: string }) {
   const [types, setTypes] = useState<TypeAvailability[] | null>(null);
   const [result, setResult] = useState<QuoteResult | null>(null);
 
-  const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
-
-  async function checkAvailability() {
+  const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));  async function checkAvailability() {
     if (!form.origin.trim() || !form.destination.trim() || !form.startDate || !form.endDate || !form.pax) {
       setError('Lengkapi rute, tanggal, dan jumlah penumpang');
       return;
@@ -115,8 +113,6 @@ export function BookingWizard({ poName }: { poName: string }) {
       setLoading(false);
     }
   }
-
-  const selectedType = types?.find((t) => t.id === form.typeId) ?? null;
 
   if (step === 0) {
     return (
@@ -178,7 +174,6 @@ export function BookingWizard({ poName }: { poName: string }) {
           {types?.map((t) => {
             const selected = form.typeId === t.id;
             const unitsNeeded = form.pax ? Math.max(form.unitCount, Math.ceil(form.pax / t.seats)) : form.unitCount;
-            const fits = !form.pax || form.pax <= t.seats * unitsNeeded;
             return (
               <button
                 key={t.id}

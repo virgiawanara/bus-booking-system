@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { canTransition, BLOCKING_STATUS, STATUS_LABEL, type QuoteStatus } from './status';
 
 describe('status transitions', () => {

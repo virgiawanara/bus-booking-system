@@ -16,7 +16,7 @@ export default async function Home() {
         <h1 className="text-[26px] font-extrabold leading-tight tracking-tight">Yuk, sewa bus<br />untuk rombongan Anda</h1>
         <p className="mt-1.5 text-sm text-ink-soft">Konsultasi harga & slot diproses admin lewat WhatsApp.</p>
       </div>
-      <BookingWizard poName={settings.PO_NAME} />
+      <BookingWizard />
       <footer className="pb-4 text-center text-xs text-ink-soft">
         Estimasi bukan penawaran mengikat · Harga final oleh admin setelah cek jadwal armada
       </footer>
