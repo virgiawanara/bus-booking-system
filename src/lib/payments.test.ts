@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createDb } from '@/db';
 import { sql, eq } from 'drizzle-orm';
-import { holds, quotes, unitTypes, units } from '@/db/schema';
+import { quotes, unitTypes, units } from '@/db/schema';
 import { createQuote } from './quotes';
 import { verifyDpPayment, verifyPelunasanPayment } from './payments';
 import { holdQuote } from './holds';

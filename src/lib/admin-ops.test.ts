@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+﻿import { beforeEach, describe, expect, it } from 'vitest';
 import { createDb } from '@/db';
 import { sql, eq } from 'drizzle-orm';
 import { crew, feedback, quotes, unitTypes, units } from '@/db/schema';
@@ -57,7 +57,7 @@ describe('setFinalPrice', () => {
 describe('issueSpk', () => {
   it('hanya dari confirmed; nomor SPK/YYYY/NNNN', async () => {
     const { q } = await seedAndConfirmedOrder();
-    const r = await issueSpk(db, { quoteId: q.id, status: q.status });
+    const r = await issueSpk(db, { quoteId: q.id });
     if (!r.ok) console.log('ISSUE_FAIL', r.reason);
     expect(r.ok).toBe(true);
 
@@ -88,7 +88,7 @@ describe('issueSpk', () => {
     });
     await holdQuote(db, { quoteId: q.id, unitIds: [u.id], holdHours: 24, bufferHours: 2 });
     await verifyDpPayment(db, { quoteId: q.id, amount: 500_000, paidAt: new Date() });
-    const r = await issueSpk(db, { quoteId: q.id, status: 'dp_paid' });
+    const r = await issueSpk(db, { quoteId: q.id });
     expect(r.ok).toBe(false);
   });
 });
@@ -97,12 +97,12 @@ describe('markDispatched / markCompleted / markContacted', () => {
   it('alur kontrol mengikuti transisi legal', async () => {
     const { q } = await seedAndConfirmedOrder();
     await setFinalPrice(db, { quoteId: q.id, finalPrice: 4_800_000 });
-    await issueSpk(db, { quoteId: q.id, status: 'confirmed' });
+    await issueSpk(db, { quoteId: q.id });
 
-    const d = await markDispatched(db, { quoteId: q.id, status: 'spk_issued' });
+    const d = await markDispatched(db, { quoteId: q.id });
     expect(d.ok).toBe(true);
 
-    const c = await markCompleted(db, { quoteId: q.id, status: 'dispatched' });
+    const c = await markCompleted(db, { quoteId: q.id });
     expect(c.ok).toBe(true);
     const after = (await db.select().from(quotes).where(eq(quotes.id, q.id)))[0];
     expect(after.status).toBe('completed');
@@ -110,7 +110,7 @@ describe('markDispatched / markCompleted / markContacted', () => {
 
   it('dispatched tidak boleh dari confirmed (harus via spk_issued)', async () => {
     const { q } = await seedAndConfirmedOrder();
-    const r = await markDispatched(db, { quoteId: q.id, status: 'confirmed' });
+    const r = await markDispatched(db, { quoteId: q.id });
     expect(r.ok).toBe(false);
   });
 
@@ -138,9 +138,9 @@ describe('cancelQuote setelah selesai', () => {
   it('completed tidak bisa dibatalkan', async () => {
     const { q } = await seedAndConfirmedOrder();
     await setFinalPrice(db, { quoteId: q.id, finalPrice: 4_800_000 });
-    await issueSpk(db, { quoteId: q.id, status: 'confirmed' });
-    await markDispatched(db, { quoteId: q.id, status: 'spk_issued' });
-    await markCompleted(db, { quoteId: q.id, status: 'dispatched' });
+    await issueSpk(db, { quoteId: q.id });
+    await markDispatched(db, { quoteId: q.id });
+    await markCompleted(db, { quoteId: q.id });
 
     const r = await cancelQuote(db, { quoteId: q.id });
     expect(r.ok).toBe(false);
@@ -148,3 +148,7 @@ describe('cancelQuote setelah selesai', () => {
     expect(after.status).toBe('completed');
   });
 });
+
+
+
+

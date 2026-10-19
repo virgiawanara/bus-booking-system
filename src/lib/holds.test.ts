@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createDb } from '@/db';
 import { quotes, units, unitTypes } from '@/db/schema';
 import { holdQuote, releaseHold, extendHold, sweepExpired } from './holds';
@@ -90,8 +90,7 @@ describe('holdQuote (konkurensi satu unit terakhir)', () => {
       quoteId: qa.id,
       unitIds: [u1.id],
       holdHours: 24,
-      now: hoursFromNow(-48), // tidak relevan, hold di masa lalu
-      holdUntil: hoursFromNow(-24),
+      now: hoursFromNow(-48), // hold di masa lalu → lease sudah berlalu
     });
     expect(r.ok).toBe(true);
 

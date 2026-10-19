@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm';
+﻿import { eq, sql } from 'drizzle-orm';
 import type { DB } from '@/db';
 import { feedback, quotes } from '@/db/schema';
 import { canTransition, type QuoteStatus } from './status';
@@ -36,7 +36,7 @@ export async function setFinalPrice(db: DB, { quoteId, finalPrice }: { quoteId: 
 }
 
 // Nomor SPK global tahunan: SPK/<tahun>/<seq>
-export async function issueSpk(db: DB, { quoteId, status }: { quoteId: number; status: string }): Promise<OpResult> {
+export async function issueSpk(db: DB, { quoteId }: { quoteId: number }): Promise<OpResult> {
   try {
     let number: string = '';
     await db.transaction(async (tx) => {
@@ -55,18 +55,17 @@ export async function issueSpk(db: DB, { quoteId, status }: { quoteId: number; s
       number = `SPK/${year}/${String(Number(maxSeq) + 1).padStart(4, '0')}`;
       await tx.update(quotes).set({ status: 'spk_issued', spkNumber: number }).where(eq(quotes.id, quoteId));
     });
-    void status;
     return { ok: true };
   } catch (e) {
     return { ok: false, reason: msg(e) };
   }
 }
 
-export function markDispatched(db: DB, { quoteId, status }: { quoteId: number; status: string }) {
+export function markDispatched(db: DB, { quoteId }: { quoteId: number }) {
   return transition(db, quoteId, 'dispatched');
 }
 
-export function markCompleted(db: DB, { quoteId, status }: { quoteId: number; status: string }) {
+export function markCompleted(db: DB, { quoteId }: { quoteId: number }) {
   return transition(db, quoteId, 'completed');
 }
 
@@ -87,3 +86,5 @@ export async function ensureFeedbackToken(db: DB, { quoteId }: { quoteId: number
   await db.insert(feedback).values({ quoteId, token });
   return token;
 }
+
+

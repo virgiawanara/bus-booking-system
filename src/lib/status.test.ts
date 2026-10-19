@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { canTransition, BLOCKING_STATUS, STATUS_LABEL } from './status';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { canTransition, BLOCKING_STATUS, STATUS_LABEL, type QuoteStatus } from './status';
 
 describe('status transitions', () => {
   it('alur utama quoted..dispatched..completed diperbolehkan', () => {
@@ -44,7 +44,7 @@ describe('BLOCKING_STATUS', () => {
 
 describe('STATUS_LABEL', () => {
   it('punya label Indonesia untuk semua status', () => {
-    for (const s of [
+    const keys: QuoteStatus[] = [
       'quoted',
       'held',
       'dp_paid',
@@ -54,7 +54,8 @@ describe('STATUS_LABEL', () => {
       'completed',
       'cancelled',
       'expired',
-    ]) {
+    ];
+    for (const s of keys) {
       expect(typeof STATUS_LABEL[s]).toBe('string');
       expect(STATUS_LABEL[s].length).toBeGreaterThan(0);
     }
