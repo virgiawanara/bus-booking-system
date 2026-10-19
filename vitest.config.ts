@@ -9,6 +9,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    fileParallelism: false, // test integrasi share satu Postgres TEST
   },
   resolve: {
     alias: { '@': path.join(r('.'), 'src') },

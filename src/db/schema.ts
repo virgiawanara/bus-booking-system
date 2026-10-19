@@ -60,7 +60,9 @@ export const quotes = pgTable('quotes', {
     .defaultNow(),
 });
 
-// Hold unit konkret oleh admin. Anti-overlap di level DB (db/extras.sql).
+// Hold unit konkret oleh admin. Dua macam waktu:
+// occupied [trip start .. trip end+buffer) = yang dilindungi DB (gist no_overlap);
+// hold_until (lease) = batas 1x24 jam untuk hold lembut (sweep on read).
 export const holds = pgTable('holds', {
   id: serial('id').primaryKey(),
   quoteId: integer('quote_id')
@@ -69,6 +71,8 @@ export const holds = pgTable('holds', {
   unitId: integer('unit_id')
     .notNull()
     .references(() => units.id),
+  occupiedFrom: timestamp('occupied_from', { withTimezone: true }).notNull(),
+  occupiedUntil: timestamp('occupied_until', { withTimezone: true }).notNull(),
   holdUntil: timestamp('hold_until', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true })
     .notNull()
