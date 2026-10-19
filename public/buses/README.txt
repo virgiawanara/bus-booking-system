@@ -1,0 +1,1 @@
+-- Foto bus sederhana (SVG) sebagai placeholder — admin mengganti URL foto asli via admin.

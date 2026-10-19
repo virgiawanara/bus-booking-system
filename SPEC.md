@@ -48,7 +48,8 @@ public/buses/      → foto bus (admin mengisi path/gambar)
 ## Status & transisi
 `quoted → held → dp_paid → confirmed → spk_issued → dispatched → completed`;
 cabang `cancelled` (dari status mana pun) dan `expired` (hold lewat; sweep on read).
-- hold: hanya admin, dari quoted/expired, pilih unit konkret; mulai hold_until = +24 jam; extend wajib alasan.
+- hold: hanya admin, dari quoted/expired, pilih unit konkret; hold lembut = now+24 jam; extend wajib alasan.
+  Saat DP terverifikasi: `convertHoldToHardLock` kunci unit sampai trip selesai + buffer.
 - dp_paid: DP terverifikasi; konfirmasi.
 
 ## Aturan bisnis
