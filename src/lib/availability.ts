@@ -16,7 +16,7 @@ export async function freeUnitsForType(
 ): Promise<{ total: number; free: number }> {
   const bufMs = bufferHours * 3_600_000;
   // Occupied range sudah memuat buffer ekor [trip start .. trip end+buffer).
-  // Kepala tak dibuffer ulang cukup satu kali; konflik bila terphi keduanya debet.
+  // Buffer diterapkan sekali di ekor; window cek ini identik dengan rentang gist no_overlap.
   const windowStart = startAt;
   const windowEnd = new Date(endAt.getTime() + bufMs);
 
