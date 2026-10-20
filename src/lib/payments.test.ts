@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createDb } from '@/db';
 import { sql, eq } from 'drizzle-orm';
-import { quotes, unitTypes, units } from '@/db/schema';
+import { quotes, payments, unitTypes, units } from '@/db/schema';
 import { createQuote } from './quotes';
 import { verifyDpPayment, verifyPelunasanPayment } from './payments';
 import { holdQuote } from './holds';
@@ -110,6 +110,21 @@ describe('verifyDpPayment (DP -> dp_paid + hard lock)', () => {
     // hard lock: lease >= endAt
     expect(after.holdUntil!.getTime()).toBeGreaterThanOrEqual(after.endAt.getTime());
   });
+
+  it('atomik: nominal tidak valid ditolak tanpa efek, lalu bisa diulang', async () => {
+    const { t, u } = await seedOneUnit();
+    const q = await createQuote(db, baseInput({ typeId: t.id }));
+    await holdQuote(db, { quoteId: q.id, unitIds: [u.id], holdHours: 24, bufferHours: 2 });
+
+    const bad = await verifyDpPayment(db, { quoteId: q.id, amount: -5, paidAt: new Date() });
+    expect(bad.ok).toBe(false);
+    expect(await db.select().from(payments)).toHaveLength(0);
+    const after = (await db.select().from(quotes).where(eq(quotes.id, q.id)))[0];
+    expect(after.status).toBe('held');
+
+    const retry = await verifyDpPayment(db, { quoteId: q.id, amount: 900_000, paidAt: new Date() });
+    expect(retry.ok).toBe(true);
+  });
 });
 
 describe('verifyPelunasanPayment (dp_paid -> confirmed)', () => {
@@ -127,5 +142,19 @@ describe('verifyPelunasanPayment (dp_paid -> confirmed)', () => {
 
     const after = (await db.select().from(quotes).where(eq(quotes.id, q.id)))[0];
     expect(after.status).toBe('confirmed');
+  });
+
+  it('nominal pelunasan harus positif, ditolak tanpa efek', async () => {
+    const { t, u } = await seedOneUnit();
+    const q = await createQuote(db, baseInput({ typeId: t.id }));
+    await holdQuote(db, { quoteId: q.id, unitIds: [u.id], holdHours: 24, bufferHours: 2 });
+    await verifyDpPayment(db, { quoteId: q.id, amount: 900_000, paidAt: new Date() });
+
+    const bad = await verifyPelunasanPayment(db, { quoteId: q.id, amount: 0, paidAt: new Date() });
+    expect(bad.ok).toBe(false);
+    const rows = await db.select().from(payments);
+    expect(rows.filter((p) => p.kind === 'pelunasan')).toHaveLength(0);
+    const after = (await db.select().from(quotes).where(eq(quotes.id, q.id)))[0];
+    expect(after.status).toBe('dp_paid');
   });
 });

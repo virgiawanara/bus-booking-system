@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { DB } from '@/db';
-import { payments, quotes } from '@/db/schema';
-import { convertHoldToHardLock } from './holds';
+import { holds, payments, quotes } from '@/db/schema';
 
 export type PaymentResult = { ok: true } | { ok: false; reason: string };
 
@@ -17,12 +16,25 @@ export type VerifyPaymentArgs = {
   proofUrl?: string | null;
 };
 
-// DP: status held -> dp_paid + hard lock unit sampai trip selesai.
+function validAmount(amount: number): boolean {
+  return Number.isInteger(amount) && amount > 0;
+}
+
+// DP: SATU transaksi — cek status, catat pembayaran, hard lock unit, set dp_paid.
+// Atomik karena kegagalan di tengah (mis. nominal jelek) tidak boleh meninggalkan
+// status berubah tanpa baris pembayaran (retry jadi mustahil).
 export async function verifyDpPayment(db: DB, args: VerifyPaymentArgs): Promise<PaymentResult> {
   try {
-    const locked = await convertHoldToHardLock(db, { quoteId: args.quoteId });
-    if (!locked.ok) return { ok: false, reason: locked.reason };
+    if (!validAmount(args.amount)) return { ok: false, reason: 'Nominal DP tidak valid' };
     await db.transaction(async (tx) => {
+      const [q] = await tx.select().from(quotes).where(eq(quotes.id, args.quoteId)).for('update');
+      if (!q) throw new Error('Quote tidak ditemukan');
+      if (q.status !== 'held') {
+        throw new Error(`DP hanya bisa diverifikasi dari status held (sekarang: ${q.status})`);
+      }
+      const rows = await tx.select().from(holds).where(eq(holds.quoteId, args.quoteId));
+      if (rows.length === 0) throw new Error('Tidak ada unit yang ditahan');
+      const hard = new Date(Math.max(...rows.map((h) => h.occupiedUntil.getTime()), Date.now()));
       await tx.insert(payments).values({
         quoteId: args.quoteId,
         kind: 'dp',
@@ -31,7 +43,8 @@ export async function verifyDpPayment(db: DB, args: VerifyPaymentArgs): Promise<
         proofUrl: args.proofUrl ?? null,
         verifiedAt: new Date(),
       });
-      await tx.update(quotes).set({ status: 'dp_paid' }).where(eq(quotes.id, args.quoteId));
+      await tx.update(holds).set({ holdUntil: hard }).where(eq(holds.quoteId, args.quoteId));
+      await tx.update(quotes).set({ status: 'dp_paid', holdUntil: hard }).where(eq(quotes.id, args.quoteId));
     });
     return { ok: true };
   } catch (e) {
@@ -39,9 +52,10 @@ export async function verifyDpPayment(db: DB, args: VerifyPaymentArgs): Promise<
   }
 }
 
-// Pelunasan: dp_paid -> confirmed.
+// Pelunasan: dp_paid -> confirmed, satu transaksi.
 export async function verifyPelunasanPayment(db: DB, args: VerifyPaymentArgs): Promise<PaymentResult> {
   try {
+    if (!validAmount(args.amount)) return { ok: false, reason: 'Nominal pelunasan tidak valid' };
     await db.transaction(async (tx) => {
       const [q] = await tx.select().from(quotes).where(eq(quotes.id, args.quoteId)).for('update');
       if (!q) throw new Error('Quote tidak ditemukan');

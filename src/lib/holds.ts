@@ -26,7 +26,7 @@ type HoldQuoteArgs = {
 };
 
 // Hold lembut: lease = now + holdHours (1x24 jam). Rentang occupied = trip + buffer.
-// DP terverifikasi → convertHoldToHardLock (lease diset sampai trip selesai).
+// DP terverifikasi → hard lock di payments.verifyDpPayment (lease sampai trip selesai).
 export async function holdQuote(db: DB, args: HoldQuoteArgs): Promise<HoldResult> {
   const { quoteId, unitIds, holdHours, bufferHours = 2, now = new Date() } = args;
   if (unitIds.length === 0) return { ok: false, reason: 'Tidak ada unit yang dipilih' };
@@ -97,33 +97,6 @@ export async function extendHold(db: DB, { quoteId, extraHours, reason, now = ne
       const newLease = new Date((q.holdUntil?.getTime() ?? now.getTime()) + extraHours * HOUR_MS);
       await tx.update(holds).set({ holdUntil: newLease }).where(eq(holds.quoteId, quoteId));
       await tx.update(quotes).set({ holdUntil: newLease, extendReason: reason.trim() }).where(eq(quotes.id, quoteId));
-    });
-    return { ok: true };
-  } catch (e) {
-    return { ok: false, reason: msg(e) };
-  }
-}
-
-// DP terverifikasi: lease melar jadi sampai trip selesai (occupiedUntil) → unit
-// tak bisa di-hold orang lain sampai trip bubar.
-export async function convertHoldToHardLock(
-  db: DB,
-  { quoteId }: { quoteId: number },
-): Promise<HoldResult> {
-  try {
-    await db.transaction(async (tx) => {
-      const [q] = await tx.select().from(quotes).where(eq(quotes.id, quoteId)).for('update');
-      if (!q) throw new Error('Quote tidak ditemukan');
-      if (q.status !== 'held') throw new Error(`Hard lock hanya dari status held (sekarang: ${q.status})`);
-
-      const holdsRows = await tx.select().from(holds).where(eq(holds.quoteId, quoteId));
-      if (holdsRows.length === 0) throw new Error('Tidak ada unit yang ditahan');
-      const hard = new Date(
-        Math.max(...holdsRows.map((h) => h.occupiedUntil.getTime()), Date.now()),
-      );
-
-      await tx.update(holds).set({ holdUntil: hard }).where(eq(holds.quoteId, quoteId));
-      await tx.update(quotes).set({ status: 'dp_paid', holdUntil: hard }).where(eq(quotes.id, quoteId));
     });
     return { ok: true };
   } catch (e) {
