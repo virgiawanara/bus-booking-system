@@ -39,6 +39,11 @@ yarn-error.log*
 # design-taste skill artifacts
 .taste-skill/
 
+# docs kept local only (per owner request)
+AGENTS.md
+SPEC.md
+README.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
