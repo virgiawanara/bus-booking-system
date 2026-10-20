@@ -83,8 +83,8 @@ export function BookingWizard() {
       setError('Lengkapi data kontak dan titik jemput');
       return;
     }
-    if (!/^\d{1,2}\.\d{2}$/.test(form.standbyTime.trim())) {
-      setError('Isi waktu standby armada, mis. 05.30');
+    if (!form.standbyTime.trim()) {
+      setError('Isi waktu standby armada terlebih dulu');
       return;
     }
     try {
@@ -96,7 +96,7 @@ export function BookingWizard() {
         origin: form.origin,
         destination: form.destination,
         pickupPoint: form.pickupPoint,
-        standbyTime: form.standbyTime.trim(),
+        standbyTime: form.standbyTime.replace(':', '.'),
         startAtISO: toISO(form.startDate),
         endAtISO: toISO(form.endDate),
         luggageNote: form.luggageNote || null,
@@ -216,8 +216,8 @@ export function BookingWizard() {
             <Input value={form.pickupPoint} onChange={(e) => set('pickupPoint', e.target.value)} placeholder="Area Parkir Gedung Graha Mandiri, Cilandak" />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Waktu standby armada" hint="Jam armada siap di titik jemput, mis. 05.30">
-              <Input value={form.standbyTime} onChange={(e) => set('standbyTime', e.target.value)} placeholder="05.30" />
+            <Field label="Waktu standby armada" hint="Jam armada siap di titik jemput (WIB)">
+              <Input type="time" value={form.standbyTime} onChange={(e) => set('standbyTime', e.target.value)} />
             </Field>
             <Field label="Jumlah unit">
               <Input type="number" min={1} max={10} value={form.unitCount} onChange={(e) => set('unitCount', Math.max(1, Number(e.target.value) || 1))} />
