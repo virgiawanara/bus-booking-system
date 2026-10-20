@@ -1,7 +1,7 @@
 ﻿import { beforeEach, describe, expect, it } from 'vitest';
 import { createDb } from '@/db';
 import { sql, eq } from 'drizzle-orm';
-import { feedback, quotes, unitTypes, units } from '@/db/schema';
+import { feedback, holds, quotes, unitTypes, units } from '@/db/schema';
 import { createQuote } from './quotes';
 import { holdQuote, cancelQuote } from './holds';
 import { verifyDpPayment, verifyPelunasanPayment } from './payments';
@@ -106,6 +106,8 @@ describe('markDispatched / markCompleted / markContacted', () => {
     expect(c.ok).toBe(true);
     const after = (await db.select().from(quotes).where(eq(quotes.id, q.id)))[0];
     expect(after.status).toBe('completed');
+    // Selesai trip: baris hold tidak menumpuk selamanya.
+    expect(await db.select().from(holds).where(eq(holds.quoteId, q.id))).toHaveLength(0);
   });
 
   it('dispatched tidak boleh dari confirmed (harus via spk_issued)', async () => {
