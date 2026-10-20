@@ -37,6 +37,21 @@ export function verifySessionValue(value: string | undefined): boolean {
   }
 }
 
+// Batas percobaan login per kunci (IP): in-memory per proses, jendela bergulir.
+// Reset saat deploy/proses restart — cukup untuk menyakiti brute-force kasar.
+const attempts = new Map<string, number[]>();
+
+export function allowLoginAttempt(
+  key: string,
+  limit = 10,
+  windowMs = 5 * 60_000,
+  now = Date.now(),
+): boolean {
+  const recent = (attempts.get(key) ?? []).filter((t) => now - t < windowMs);
+  attempts.set(key, [...recent, now]);
+  return recent.length < limit;
+}
+
 export async function isAdmin(): Promise<boolean> {
   const store = await cookies();
   return verifySessionValue(store.get(COOKIE)?.value);

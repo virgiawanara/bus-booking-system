@@ -5,7 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getDb, type DB } from '@/db';
 import { assignments, settings, unitTypes, units } from '@/db/schema';
-import { requireAdmin, loginAdmin, logoutAdmin } from '@/lib/auth';
+import { requireAdmin, loginAdmin, logoutAdmin, allowLoginAttempt } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { holdQuote, extendHold, releaseHold, cancelQuote } from '@/lib/holds';
 import { verifyDpPayment, verifyPelunasanPayment } from '@/lib/payments';
 import {
@@ -50,6 +51,10 @@ function flushed(path: string, msg: string): never {
 }
 
 export async function loginAction(fd: FormData): Promise<void> {
+  const ip = ((await headers()).get('x-forwarded-for') ?? 'local').split(',')[0].trim() || 'local';
+  if (!allowLoginAttempt(`login:${ip}`)) {
+    redirect('/admin/login?err=' + encodeURIComponent('Terlalu banyak percobaan — coba beberapa menit lagi'));
+  }
   const password = s(fd, 'password');
   if (!(await loginAdmin(password))) {
     redirect('/admin/login?err=' + encodeURIComponent('Password salah'));
