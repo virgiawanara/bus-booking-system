@@ -16,8 +16,7 @@ type WaQuote = {
   estimate: number;
 };
 
-const PRICING_NOTE =
-  'Catatan: harga belum termasuk tol, parkir, retribusi wisata, dan tips kru.';
+const PRICING_NOTE = 'Harga belum termasuk tol, parkir, retribusi wisata, dan tips kru';
 
 export function normalizePhone(raw: string): string {
   let n = raw.replace(/\D/g, '');
@@ -70,9 +69,10 @@ export function buildWaMessage({
     `Tanggal Perjalanan: ${formatDateJakarta(quote.startAt)} s/d ${formatDateJakarta(quote.endAt)} (${est.days} Hari)`,
     `Pilihan Armada: ${typeName} (${seats} Seat) - ${quote.unitCount} Unit`,
     `Estimasi Biaya Sistem: Mulai dari ${formatIDR(quote.estimate)}`,
-    `${PRICING_NOTE}`,
     `Titik Jemput Spesifik: ${quote.pickupPoint}`,
     `Waktu Standby: Pukul ${quote.standbyTime} WIB`,
+    '',
+    PRICING_NOTE,
     '',
     'Mohon informasi ketersediaan pasti dan petunjuk pembayaran DP-nya. Terima kasih.',
   ];
@@ -84,10 +84,6 @@ export function buildWaLink(rawNumber: string, message: string): string {
   const number = normalizePhone(rawNumber);
   if (message.length >= 1500) throw new Error('Pesan WA terlalu panjang (>=1500)');
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-}
-
-export function priceNote(): string {
-  return PRICING_NOTE;
 }
 
 export { TWO_HOURS_MS };

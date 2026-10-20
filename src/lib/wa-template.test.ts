@@ -61,6 +61,16 @@ describe('buildWaMessage', () => {
     expect(msg).toContain('belum termasuk tol, parkir, retribusi wisata, dan tips kru');
   });
 
+  it('urutan: catatan harga setelah rincian, sebelum penutup', () => {
+    const iStandby = msg.indexOf('Waktu Standby');
+    const iNote = msg.indexOf('Harga belum termasuk');
+    const iClose = msg.indexOf('Mohon informasi');
+    expect(iStandby).toBeGreaterThan(-1);
+    expect(iNote).toBeGreaterThan(iStandby);
+    expect(iClose).toBeGreaterThan(iNote);
+    expect(msg).not.toContain('Catatan: harga');
+  });
+
   it('di bawah batas wa.me', () => {
     expect(msg.length).toBeLessThan(1500);
   });
