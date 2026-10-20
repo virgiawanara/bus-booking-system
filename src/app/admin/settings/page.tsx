@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import Link from 'next/link';
@@ -21,7 +21,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <h1 className="text-2xl font-extrabold tracking-tight">Setelan</h1>
           <p className="text-sm text-ink-soft">Nama PO, nomor WhatsApp tujuan, persen DP, dan aturan hold.</p>
         </div>
-        <Link href="/admin" className="text-sm text-ink-soft hover:text-ink">â† Antrian</Link>
+        <Link href="/admin" className="text-sm text-ink-soft hover:text-ink">← Antrian</Link>
       </div>
 
       {err ? <Card className="border border-danger/30"><p className="text-sm font-semibold text-danger">{err}</p></Card> : null}

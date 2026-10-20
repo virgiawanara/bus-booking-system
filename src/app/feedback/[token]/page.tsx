@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import { eq } from 'drizzle-orm';
@@ -34,7 +34,7 @@ export default async function FeedbackPage({ params, searchParams }: { params: P
     return (
       <main className="mx-auto flex min-h-dvh max-w-xl flex-col justify-center px-4 py-8">
         <div className="rounded-[18px] bg-surface p-8 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-          <p className="text-4xl">ðŸ™</p>
+          <p className="text-4xl">🙏</p>
           <h1 className="mt-3 text-xl font-extrabold tracking-tight">Terima kasih!</h1>
           <p className="mt-2 text-sm text-ink-soft">
             Penilaian Anda untuk perjalanan {q.code} sudah kami terima. Sampai jumpa di trip berikutnya.
@@ -50,7 +50,7 @@ export default async function FeedbackPage({ params, searchParams }: { params: P
         <span className="text-sm font-bold tracking-tight">{settings.PO_NAME}</span>
         <h1 className="mt-2 text-2xl font-extrabold leading-tight tracking-tight">Bagaimana perjalanannya?</h1>
         <p className="mt-1 text-sm text-ink-soft">
-          {q.code} Â· {q.origin} â†’ {q.destination} Â· selesai {fmtDate(q.endAt)}
+          {q.code} · {q.origin} → {q.destination} · selesai {fmtDate(q.endAt)}
         </p>
       </header>
 
@@ -66,7 +66,7 @@ export default async function FeedbackPage({ params, searchParams }: { params: P
             {[1, 2, 3, 4, 5].map((n) => (
               <label key={n} className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line px-3.5 py-2.5 text-sm font-semibold hover:border-ink/40">
                 <input type="radio" name="rating" value={n} required className="size-4" />
-                {n} â˜…
+                {n} ★
               </label>
             ))}
           </div>

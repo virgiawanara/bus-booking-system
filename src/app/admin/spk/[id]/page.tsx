@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import { notFound, redirect } from 'next/navigation';
@@ -48,10 +48,10 @@ export default async function SpkPage({ params }: { params: Promise<{ id: string
         <tbody className="[&_th]:w-44 [&_th]:font-semibold [&_th]:py-1 [&_td]:py-1 align-top">
           <tr><th>Pemesan / PIC</th><td>: {q.picName}</td></tr>
           <tr><th>Kontak WA</th><td>: {q.phone}</td></tr>
-          <tr><th>Rute</th><td>: {q.origin} â†’ {q.destination}</td></tr>
-          <tr><th>Jadwal</th><td>: {fmtDate(q.startAt)} s/d {fmtDate(q.endAt)} Â· standby {q.standbyTime} WIB</td></tr>
+          <tr><th>Rute</th><td>: {q.origin} → {q.destination}</td></tr>
+          <tr><th>Jadwal</th><td>: {fmtDate(q.startAt)} s/d {fmtDate(q.endAt)} · standby {q.standbyTime} WIB</td></tr>
           <tr><th>Titik jemput</th><td>: {q.pickupPoint} (koordinasi akses bus besar di H-1)</td></tr>
-          <tr><th>Armada</th><td>: {q.unitCount}Ã— {type?.name}{holdRows.length > 0 ? ` (${holdRows.map((r) => r.plate).join(', ')})` : ''}</td></tr>
+          <tr><th>Armada</th><td>: {q.unitCount}× {type?.name}{holdRows.length > 0 ? ` (${holdRows.map((r) => r.plate).join(', ')})` : ''}</td></tr>
           {q.luggageNote ? <tr><th>Bagasi</th><td>: {q.luggageNote}</td></tr> : null}
         </tbody>
       </table>
@@ -76,7 +76,7 @@ export default async function SpkPage({ params }: { params: Promise<{ id: string
         {assigned.length > 0 ? (
           <ul className="list-disc pl-5">
             {assigned.map((c) => (
-              <li key={c.id}>{c.role === 'driver' ? 'Driver' : 'Co-driver'}: {c.name} â€” {c.phone}</li>
+              <li key={c.id}>{c.role === 'driver' ? 'Driver' : 'Co-driver'}: {c.name} — {c.phone}</li>
             ))}
           </ul>
         ) : (

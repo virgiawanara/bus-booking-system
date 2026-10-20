@@ -1,4 +1,4 @@
-﻿import { eq, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { DB } from '@/db';
 import { feedback, holds, quotes } from '@/db/schema';
 import { canTransition, type QuoteStatus } from './status';

@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import Link from 'next/link';
@@ -51,10 +51,10 @@ export default async function AdminQueuePage() {
                       {q.contactedAt ? <span className="text-[11px] text-ink-soft">sudah dihubungi</span> : null}
                     </div>
                     <p className="mt-1 truncate text-sm text-ink-soft">
-                      {q.picName} Â· {q.phone} Â· {q.origin} â†’ {q.destination}
+                      {q.picName} · {q.phone} · {q.origin} → {q.destination}
                     </p>
                     <p className="mt-0.5 text-[13px] text-ink-soft">
-                      {fmtDate(q.startAt)} â†’ {fmtDate(q.endAt)} Â· {q.unitCount}Ã— {typeName}
+                      {fmtDate(q.startAt)} → {fmtDate(q.endAt)} · {q.unitCount}× {typeName}
                     </p>
                   </div>
                   <div className="text-right">
@@ -73,7 +73,7 @@ export default async function AdminQueuePage() {
           <div className="grid gap-2">
             {closed.map(({ q }) => (
               <Link key={q.id} href={`/admin/q/${q.id}`} className="flex items-center justify-between rounded-[18px] bg-surface px-4 py-2.5 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-                <span className="text-ink-soft">{q.code} Â· {STATUS_LABEL[q.status as QuoteStatus]} Â· {fmtDate(q.startAt)}</span>
+                <span className="text-ink-soft">{q.code} · {STATUS_LABEL[q.status as QuoteStatus]} · {fmtDate(q.startAt)}</span>
                 <span className="font-semibold">{q.picName}</span>
               </Link>
             ))}

@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import { redirect } from 'next/navigation';

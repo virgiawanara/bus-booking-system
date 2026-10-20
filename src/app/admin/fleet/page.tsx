@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import { Card, Button, Input, Pill, Select } from '@/components/ui';
 import { fmtIDR } from '@/lib/format';
 import { saveUnitTypeAction, saveUnitAction, toggleUnitAction, saveCrewAction, toggleCrewAction } from '@/app/admin-actions';
 
-const CONTOH_WARN = 'âš ï¸ Tarif di bawah masih CONTOH â€” ganti dengan tarif asli PO sebelum dipakai!';
+const CONTOH_WARN = '⚠️ Tarif di bawah masih CONTOH — ganti dengan tarif asli PO sebelum dipakai!';
 
 export default async function FleetPage({ searchParams }: { searchParams: Promise<{ err?: string; ok?: string }> }) {
   await requireAdmin();
@@ -27,11 +27,11 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           <h1 className="text-2xl font-extrabold tracking-tight">Armada</h1>
           <p className="text-sm text-ink-soft">Tipe unit (foto, fasilitas, tarif) dan plat masing-masing.</p>
         </div>
-        <Link href="/admin" className="text-sm text-ink-soft hover:text-ink">â† Antrian</Link>
+        <Link href="/admin" className="text-sm text-ink-soft hover:text-ink">← Antrian</Link>
       </div>
 
       <div className="rounded-[18px] border border-warn/40 bg-warn/10 p-3 text-sm font-semibold text-warn">
-        âš ï¸ Tarif awal masih CONTOH â€” ganti dengan tarif asli PO lewat form di bawah sebelum dipakai!
+        ⚠️ Tarif awal masih CONTOH — ganti dengan tarif asli PO lewat form di bawah sebelum dipakai!
       </div>
       {err ? <Card className="border border-danger/30"><p className="text-sm font-semibold text-danger">{err}</p></Card> : null}
       {ok ? <Card className="border border-ok/30"><p className="text-sm font-semibold text-ok">{ok}</p></Card> : null}
@@ -48,7 +48,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                   <h2 className="font-bold">{t.name}</h2>
                   {!t.active ? <Pill tone="warn">nonaktif</Pill> : null}
                 </div>
-                <p className="text-sm text-ink-soft">{t.seats} seat Â· {fmtIDR(t.ratePerDay)}/hari Â· {tUnits.filter((u) => u.active).length} unit aktif</p>
+                <p className="text-sm text-ink-soft">{t.seats} seat · {fmtIDR(t.ratePerDay)}/hari · {tUnits.filter((u) => u.active).length} unit aktif</p>
                 <p className="mt-1 text-xs text-ink-soft">{facilities}</p>
                 {t.ratePerDay < 500_000 ? <p className="mt-2 text-xs font-bold text-warn">{CONTOH_WARN}</p> : null}
               </div>

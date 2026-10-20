@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import Link from 'next/link';
@@ -17,9 +17,9 @@ export default async function DispatchPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">Dispatch H-1</h1>
-          <p className="text-sm text-ink-soft">Keberangkatan â‰¤36 jam: konfirmasi kru, kirim kontak ke pelanggan, koordinasi titik jemput.</p>
+          <p className="text-sm text-ink-soft">Keberangkatan ≤36 jam: konfirmasi kru, kirim kontak ke pelanggan, koordinasi titik jemput.</p>
         </div>
-        <Link href="/admin" className="text-sm text-ink-soft hover:text-ink">â† Antrian</Link>
+        <Link href="/admin" className="text-sm text-ink-soft hover:text-ink">← Antrian</Link>
       </div>
 
       {rows.length === 0 ? (
@@ -34,14 +34,14 @@ export default async function DispatchPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-bold">{q.code}</span>
                     <Pill tone={q.status === 'dispatched' ? 'ok' : 'warn'}>
-                      {q.status === 'dispatched' ? 'Kru terkirim âœ“' : 'Belum dispatch'}
+                      {q.status === 'dispatched' ? 'Kru terkirim ✓' : 'Belum dispatch'}
                     </Pill>
                   </div>
                   <p className="mt-1 text-sm text-ink-soft">
-                    {q.picName} Â· {q.pickupPoint}
+                    {q.picName} · {q.pickupPoint}
                   </p>
                   <p className="text-[13px] text-ink-soft">
-                    Berangkat {fmtDate(q.startAt)} Â· {q.unitCount}Ã— {typeName}
+                    Berangkat {fmtDate(q.startAt)} · {q.unitCount}× {typeName}
                   </p>
                 </div>
                 <span className="text-xs font-semibold text-ink-soft">Standby {q.standbyTime} WIB</span>
@@ -50,7 +50,7 @@ export default async function DispatchPage() {
           </Link>
         ))}
       </div>
-      <p className="text-center text-xs text-ink-soft">Kontak kru + koordinasi titik jemput dikirim lewat halaman detail (Antrian â†’ detail â†’ Kru).</p>
+      <p className="text-center text-xs text-ink-soft">Kontak kru + koordinasi titik jemput dikirim lewat halaman detail (Antrian → detail → Kru).</p>
     </div>
   );
 }

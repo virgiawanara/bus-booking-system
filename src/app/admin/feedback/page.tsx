@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import Link from 'next/link';
@@ -22,10 +22,10 @@ export default async function FeedbackAdminPage() {
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">Feedback H+1</h1>
           <p className="text-sm text-ink-soft">
-            Trip yang selesai â‰¤14 hari. Buat link rating, kirim via WA, admin menandai sendiri (tanpa auto-send).
+            Trip yang selesai ≤14 hari. Buat link rating, kirim via WA, admin menandai sendiri (tanpa auto-send).
           </p>
         </div>
-        <Link href="/admin" className="text-sm text-ink-soft hover:text-ink">â† Antrian</Link>
+        <Link href="/admin" className="text-sm text-ink-soft hover:text-ink">← Antrian</Link>
       </div>
 
       {rows.length === 0 ? (
@@ -35,7 +35,7 @@ export default async function FeedbackAdminPage() {
       <div className="grid gap-3">
         {rows.map(({ q, typeName, fbRow }) => {
           const link = fbRow ? `${BASE_URL}/feedback/${fbRow.token}` : null;
-          const sendMsg = `Terima kasih telah memesan bus di ${settings.PO_NAME} ðŸ™\nBantu kami dengan memberi rating perjalanan ${q.code}:\n${link ?? ''}`;
+          const sendMsg = `Terima kasih telah memesan bus di ${settings.PO_NAME} 🙏\nBantu kami dengan memberi rating perjalanan ${q.code}:\n${link ?? ''}`;
           return (
             <Card key={q.id}>
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -47,11 +47,11 @@ export default async function FeedbackAdminPage() {
                     </Pill>
                   </div>
                   <p className="mt-1 text-sm text-ink-soft">
-                    {q.picName} Â· {fmtDate(q.endAt)} selesai Â· {q.unitCount}Ã— {typeName}
+                    {q.picName} · {fmtDate(q.endAt)} selesai · {q.unitCount}× {typeName}
                   </p>
                   {fbRow?.rating ? (
                     <p className="mt-0.5 text-[13px] font-semibold">
-                      Rating {fbRow.rating}/5{fbRow.comment ? ` Â· "${fbRow.comment}"` : ''}
+                      Rating {fbRow.rating}/5{fbRow.comment ? ` · "${fbRow.comment}"` : ''}
                     </p>
                   ) : null}
                 </div>

@@ -1,4 +1,4 @@
-﻿// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
+// Halaman dinamis (cookies + DB) — blok eksplisit untuk Next Cache Components.
 export const instant = false;
 
 import Link from 'next/link';
@@ -58,7 +58,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
       ? assignedCrew.map((c) => `${c.role === 'driver' ? 'Driver' : 'Co-driver'}: ${c.name} - ${c.phone}`)
       : []),
     '',
-    `${type?.name} Â· ${q.unitCount} unit`,
+    `${type?.name} · ${q.unitCount} unit`,
     `Rute: ${q.origin} -> ${q.destination}`,
     `Jadwal: ${fmtDate(q.startAt)} - ${fmtDate(q.endAt)}`,
     `Standby: ${q.standbyTime} WIB di ${q.pickupPoint}`,
@@ -69,7 +69,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
   return (
     <div className="grid gap-4">
       <div className="flex items-center gap-2 text-sm">
-        <Link href="/admin" className="text-ink-soft hover:text-ink">â† Antrian</Link>
+        <Link href="/admin" className="text-ink-soft hover:text-ink">← Antrian</Link>
       </div>
 
       {err ? <Card className="border border-danger/30"><p className="text-sm font-semibold text-danger">{err}</p></Card> : null}
@@ -85,7 +85,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                 {STATUS_LABEL[q.status as QuoteStatus]}
               </Pill>
             </div>
-            <p className="mt-1 text-sm text-ink-soft">{settings.PO_NAME} Â· dibuat {fmtDateTime(q.createdAt)}</p>
+            <p className="mt-1 text-sm text-ink-soft">{settings.PO_NAME} · dibuat {fmtDateTime(q.createdAt)}</p>
           </div>
           <div className="flex gap-2">
             <a href={waPhoneLink(q.phone, `Halo ${q.picName}, saya admin ${settings.PO_NAME} soal quote ${q.code}.`)} target="_blank" rel="noreferrer">
@@ -100,13 +100,13 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
         <dl className="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           <Row k="PIC" v={q.picName} />
           <Row k="WA" v={q.phone} />
-          <Row k="Rute" v={`${q.origin} â†’ ${q.destination}`} />
-          <Row k="Jadwal" v={`${fmtDate(q.startAt)} â†’ ${fmtDate(q.endAt)} Â· standby ${q.standbyTime} WIB`} />
+          <Row k="Rute" v={`${q.origin} → ${q.destination}`} />
+          <Row k="Jadwal" v={`${fmtDate(q.startAt)} → ${fmtDate(q.endAt)} · standby ${q.standbyTime} WIB`} />
           <Row k="Titik jemput" v={q.pickupPoint} />
-          <Row k="Kapasitas" v={`${type?.seats ?? '?'} seat Ã— ${q.unitCount} unit${q.luggageNote ? ` Â· bagasi: ${q.luggageNote}` : ''}`} />
+          <Row k="Kapasitas" v={`${type?.seats ?? '?'} seat × ${q.unitCount} unit${q.luggageNote ? ` · bagasi: ${q.luggageNote}` : ''}`} />
           {q.notes ? <Row k="Catatan" v={q.notes} /> : null}
           <Row k="Estimasi sistem" v={fmtIDR(q.estimate)} />
-          <Row k="Harga final" v={q.finalPrice ? fmtIDR(q.finalPrice) : 'â€” belum ditetapkan'} />
+          <Row k="Harga final" v={q.finalPrice ? fmtIDR(q.finalPrice) : '— belum ditetapkan'} />
         </dl>
       </Card>
 
@@ -114,20 +114,20 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
       <Card>
         <h2 className="mb-1 text-base font-bold">Unit Ditahan (Hold)</h2>
         <p className="mb-3 text-xs text-ink-soft">
-          Hold lembut 1Ã—{settings.HOLD_HOURS} jam. Jatuh tempo: <b className="text-ink">{q.holdUntil ? fmtDateTime(q.holdUntil) : 'â€”'}</b>
+          Hold lembut 1×{settings.HOLD_HOURS} jam. Jatuh tempo: <b className="text-ink">{q.holdUntil ? fmtDateTime(q.holdUntil) : '—'}</b>
         </p>
         {q.status === 'held' ? (
           <div className="grid gap-3">
             <div className="flex flex-wrap gap-2">
               {holdRows.map(({ h, plate }) => (
-                <span key={h.id} className="rounded-full bg-warn/10 px-3 py-1.5 text-xs font-semibold text-warn">ðŸ”’ {plate}</span>
+                <span key={h.id} className="rounded-full bg-warn/10 px-3 py-1.5 text-xs font-semibold text-warn">🔒 {plate}</span>
               ))}
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <form action={extendAction} className="flex items-center gap-2">
                 <input type="hidden" name="quoteId" value={q.id} />
                 <Input type="number" name="extraHours" min={1} max={72} defaultValue={24} className="!w-24" />
-                <Input name="reason" placeholder="Alasan perpanjangâ€¦" required />
+                <Input name="reason" placeholder="Alasan perpanjang…" required />
                 <Button variant="ghost">Perpanjang</Button>
               </form>
               <form action={releaseAction} className="flex items-center">
@@ -156,7 +156,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
           </form>
         ) : (
           <div className="flex flex-wrap gap-2 text-sm text-ink-soft">
-            {holdRows.length > 0 ? holdRows.map(({ h, plate }) => <Pill key={h.id} tone="ok">ðŸ”’ {plate}</Pill>) : <p>Tidak ada unit ditahan pada status ini.</p>}
+            {holdRows.length > 0 ? holdRows.map(({ h, plate }) => <Pill key={h.id} tone="ok">🔒 {plate}</Pill>) : <p>Tidak ada unit ditahan pada status ini.</p>}
           </div>
         )}
       </Card>
@@ -165,16 +165,16 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
       <Card>
         <h2 className="mb-1 text-base font-bold">Pembayaran</h2>
         <p className="mb-3 text-xs text-ink-soft">
-          DP ideal Â±{settings.DP_PERCENT}% = {fmtIDR(dpIdeal)} Â· Pelunasan H-{settings.PELUNASAN_H} Â· bukti sah dulu, baru verifikasi.
+          DP ideal ±{settings.DP_PERCENT}% = {fmtIDR(dpIdeal)} · Pelunasan H-{settings.PELUNASAN_H} · bukti sah dulu, baru verifikasi.
         </p>
         <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
           <div className="rounded-xl bg-bg p-3">
             <p className="text-xs text-ink-soft">DP</p>
-            <p className={cx('font-bold', dpPaid ? 'text-ok' : 'text-ink')}>{dpPaid ? `âœ… ${fmtIDR(dpAmount)}` : 'belum'}</p>
+            <p className={cx('font-bold', dpPaid ? 'text-ok' : 'text-ink')}>{dpPaid ? `✅ ${fmtIDR(dpAmount)}` : 'belum'}</p>
           </div>
           <div className="rounded-xl bg-bg p-3">
             <p className="text-xs text-ink-soft">Pelunasan</p>
-            <p className={cx('font-bold', pelunasanPaid ? 'text-ok' : 'text-ink')}>{pelunasanPaid ? `âœ… ${fmtIDR(allPelunasan)}` : 'belum'}</p>
+            <p className={cx('font-bold', pelunasanPaid ? 'text-ok' : 'text-ink')}>{pelunasanPaid ? `✅ ${fmtIDR(allPelunasan)}` : 'belum'}</p>
           </div>
         </div>
         {q.status === 'held' ? (
@@ -182,7 +182,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
             <input type="hidden" name="quoteId" value={q.id} />
             <Input type="number" name="amount" min={1} defaultValue={dpIdeal} className="!w-40" />
             <Input name="proofUrl" placeholder="URL bukti bilyet (opsional)" className="!w-56" />
-            <Button>Verifikasi DP â†’ kunci unit</Button>
+            <Button>Verifikasi DP → kunci unit</Button>
           </form>
         ) : null}
         {q.status === 'dp_paid' ? (
@@ -237,7 +237,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
                   <label key={c.id} className="flex items-center gap-2 rounded-xl border border-line px-3 py-2 text-sm">
                     <input type="checkbox" name="crewIds" value={c.id} defaultChecked={crewIds.includes(c.id)} className="size-4" />
                     <span className="font-semibold">{c.name}</span>
-                    <span className="text-xs text-ink-soft">{c.role === 'driver' ? 'Driver' : 'Co-driver'} Â· {c.phone}</span>
+                    <span className="text-xs text-ink-soft">{c.role === 'driver' ? 'Driver' : 'Co-driver'} · {c.phone}</span>
                   </label>
                 ))}
               </div>
@@ -270,7 +270,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
         {fb ? (
           <div className="grid gap-1 text-sm">
             <p>Token: <code className="rounded bg-bg px-1.5 py-0.5 text-xs">{fb.token}</code></p>
-            <p className="text-ink-soft">Rating: {fb.rating ?? 'â€”'} {fb.comment ? `Â· "${fb.comment}"` : ''}</p>
+            <p className="text-ink-soft">Rating: {fb.rating ?? '—'} {fb.comment ? `· "${fb.comment}"` : ''}</p>
             <a href={`/feedback/${fb.token}`} target="_blank" rel="noreferrer" className="text-sm font-semibold underline">Buka form feedback</a>
           </div>
         ) : ['dispatched', 'completed'].includes(q.status) ? (
