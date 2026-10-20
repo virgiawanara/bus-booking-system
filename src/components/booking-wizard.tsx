@@ -215,14 +215,9 @@ export function BookingWizard() {
           <Field label="Titik jemput spesifik">
             <Input value={form.pickupPoint} onChange={(e) => set('pickupPoint', e.target.value)} placeholder="Area Parkir Gedung Graha Mandiri, Cilandak" />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Waktu standby armada" hint="Jam armada siap di titik jemput (WIB)">
-              <Input type="time" value={form.standbyTime} onChange={(e) => set('standbyTime', e.target.value)} />
-            </Field>
-            <Field label="Jumlah unit">
-              <Input type="number" min={1} max={10} value={form.unitCount} onChange={(e) => set('unitCount', Math.max(1, Number(e.target.value) || 1))} />
-            </Field>
-          </div>
+          <Field label="Waktu standby armada" hint="Jam armada siap di titik jemput (WIB)">
+            <Input type="time" value={form.standbyTime} onChange={(e) => set('standbyTime', e.target.value)} />
+          </Field>
           <Field label="Catatan bagasi (opsional)">
             <Textarea value={form.luggageNote} onChange={(e) => set('luggageNote', e.target.value)} placeholder="±30 tas sekolahan + 2 sound system" />
           </Field>
