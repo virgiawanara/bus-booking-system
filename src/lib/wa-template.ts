@@ -58,7 +58,7 @@ export function buildWaMessage({
   });
 
   const lines = [
-    `Halo Admin Reservasi ${poName},`,
+    `Halo Admin Reservasi *${poName}*,`,
     '',
     'Saya ingin konfirmasi pemesanan sewa bus dengan rincian berikut:',
     '',
@@ -72,7 +72,7 @@ export function buildWaMessage({
     `Titik Jemput Spesifik: ${quote.pickupPoint}`,
     `Waktu Standby: Pukul ${quote.standbyTime} WIB`,
     '',
-    PRICING_NOTE,
+    `*${PRICING_NOTE}*`,
     '',
     'Mohon informasi ketersediaan pasti dan petunjuk pembayaran DP-nya. Terima kasih.',
   ];

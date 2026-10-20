@@ -47,7 +47,7 @@ describe('buildWaMessage', () => {
   });
 
   it('berisi rincian lengkap', () => {
-    expect(msg).toContain('PO Bus Sejahtera');
+    expect(msg).toContain('*PO Bus Sejahtera*');
     expect(msg).toContain('Q-2026-0001');
     expect(msg).toContain('Bpk. Rian Pratama');
     expect(msg).toContain('Jakarta (Cilandak) -> Yogyakarta (Malioboro)');
@@ -63,7 +63,7 @@ describe('buildWaMessage', () => {
 
   it('urutan: catatan harga setelah rincian, sebelum penutup', () => {
     const iStandby = msg.indexOf('Waktu Standby');
-    const iNote = msg.indexOf('Harga belum termasuk');
+    const iNote = msg.indexOf('*Harga belum termasuk');
     const iClose = msg.indexOf('Mohon informasi');
     expect(iStandby).toBeGreaterThan(-1);
     expect(iNote).toBeGreaterThan(iStandby);
