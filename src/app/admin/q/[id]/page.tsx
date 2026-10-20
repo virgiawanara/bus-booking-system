@@ -103,7 +103,7 @@ export default async function QuoteDetailPage({ params, searchParams }: { params
           <Row k="Rute" v={`${q.origin} â†’ ${q.destination}`} />
           <Row k="Jadwal" v={`${fmtDate(q.startAt)} â†’ ${fmtDate(q.endAt)} Â· standby ${q.standbyTime} WIB`} />
           <Row k="Titik jemput" v={q.pickupPoint} />
-          <Row k="Kapasitas" v={`${q.pax} pax / ${type?.seats ?? '?'} seat Ã— ${q.unitCount} unit${q.luggageNote ? ` Â· bagasi: ${q.luggageNote}` : ''}`} />
+          <Row k="Kapasitas" v={`${type?.seats ?? '?'} seat Ã— ${q.unitCount} unit${q.luggageNote ? ` Â· bagasi: ${q.luggageNote}` : ''}`} />
           {q.notes ? <Row k="Catatan" v={q.notes} /> : null}
           <Row k="Estimasi sistem" v={fmtIDR(q.estimate)} />
           <Row k="Harga final" v={q.finalPrice ? fmtIDR(q.finalPrice) : 'â€” belum ditetapkan'} />

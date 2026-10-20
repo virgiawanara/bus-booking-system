@@ -41,7 +41,7 @@ export default async function DispatchPage() {
                     {q.picName} Â· {q.pickupPoint}
                   </p>
                   <p className="text-[13px] text-ink-soft">
-                    Berangkat {fmtDate(q.startAt)} Â· {q.unitCount}Ã— {typeName} Â· {q.pax} pax
+                    Berangkat {fmtDate(q.startAt)} Â· {q.unitCount}Ã— {typeName}
                   </p>
                 </div>
                 <span className="text-xs font-semibold text-ink-soft">Standby {q.standbyTime} WIB</span>

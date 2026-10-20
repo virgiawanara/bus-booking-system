@@ -54,7 +54,7 @@ export default async function AdminQueuePage() {
                       {q.picName} Â· {q.phone} Â· {q.origin} â†’ {q.destination}
                     </p>
                     <p className="mt-0.5 text-[13px] text-ink-soft">
-                      {fmtDate(q.startAt)} â†’ {fmtDate(q.endAt)} Â· {q.pax} pax Â· {q.unitCount}Ã— {typeName}
+                      {fmtDate(q.startAt)} â†’ {fmtDate(q.endAt)} Â· {q.unitCount}Ã— {typeName}
                     </p>
                   </div>
                   <div className="text-right">

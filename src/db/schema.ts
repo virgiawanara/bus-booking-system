@@ -41,7 +41,6 @@ export const quotes = pgTable('quotes', {
   standbyTime: text('standby_time').notNull(), // "05.30"
   startAt: timestamp('start_at', { withTimezone: true }).notNull(),
   endAt: timestamp('end_at', { withTimezone: true }).notNull(),
-  pax: integer('pax').notNull(),
   luggageNote: text('luggage_note'),
   unitCount: integer('unit_count').notNull(),
   typeId: integer('type_id')

@@ -11,7 +11,6 @@ const quote = {
   standbyTime: '05.30',
   startAt: new Date('2026-10-24T05:30:00+07:00'),
   endAt: new Date('2026-10-26T20:30:00+07:00'),
-  pax: 30,
   unitCount: 1,
   estimate: 4_500_000,
 };
@@ -55,7 +54,7 @@ describe('buildWaMessage', () => {
     expect(msg).toContain('24 Oktober 2026');
     expect(msg).toContain('26 Oktober 2026');
     expect(msg).toContain('(3 Hari)');
-    expect(msg).toContain('±30 Orang');
+    expect(msg).toContain('VIP (31 Seat) (31 Seat) - 1 Unit');
   });
 
   it('berisi catatan harga wajib', () => {

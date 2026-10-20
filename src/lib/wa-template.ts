@@ -12,7 +12,6 @@ type WaQuote = {
   standbyTime: string;
   startAt: Date;
   endAt: Date;
-  pax: number;
   unitCount: number;
   estimate: number;
 };
@@ -69,7 +68,6 @@ export function buildWaMessage({
     `No. Kontak: ${quote.phone}`,
     `Rute: ${quote.origin} -> ${quote.destination}`,
     `Tanggal Perjalanan: ${formatDateJakarta(quote.startAt)} s/d ${formatDateJakarta(quote.endAt)} (${est.days} Hari)`,
-    `Jumlah Penumpang: ±${quote.pax} Orang`,
     `Pilihan Armada: ${typeName} (${seats} Seat) - ${quote.unitCount} Unit`,
     `Estimasi Biaya Sistem: Mulai dari ${formatIDR(quote.estimate)}`,
     `${PRICING_NOTE}`,

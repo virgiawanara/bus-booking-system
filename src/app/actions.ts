@@ -69,7 +69,6 @@ export type CreateQuotePublicInput = {
   standbyTime: string;
   startAtISO: string;
   endAtISO: string;
-  pax: number;
   luggageNote?: string | null;
   unitCount: number;
   typeId: number;
@@ -95,7 +94,6 @@ export async function createQuoteAction(
       standbyTime: input.standbyTime,
       startAt,
       endAt,
-      pax: input.pax,
       luggageNote: input.luggageNote ?? null,
       unitCount: input.unitCount,
       typeId: input.typeId,
@@ -117,7 +115,6 @@ export async function createQuoteAction(
         standbyTime: q.standbyTime,
         startAt: q.startAt,
         endAt: q.endAt,
-        pax: q.pax,
         unitCount: q.unitCount,
         estimate: q.estimate,
       },

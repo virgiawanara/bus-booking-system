@@ -34,7 +34,6 @@ function baseInput(overrides: Partial<QuoteInput> = {}): QuoteInput {
     standbyTime: '05.30',
     startAt: start,
     endAt: addDays(start, 2),
-    pax: 30,
     luggageNote: null,
     unitCount: 1,
     typeId: 0,
@@ -54,11 +53,6 @@ describe('createQuote', () => {
     // 2 durasi hari x 1.5jt = 3jt (rate contoh)
     expect(q.estimate).toBe(3_000_000);
     expect(u.plate).toBeDefined();
-  });
-
-  it('pax melebihi kapasitas ditolak', async () => {
-    const { t } = await seedOneUnit();
-    await expect(createQuote(db, baseInput({ typeId: t.id, pax: 50 }))).rejects.toThrow(/kapasitas/i);
   });
 
   it('unit tidak positif / tanggal kembali lebih awal ditolak', async () => {

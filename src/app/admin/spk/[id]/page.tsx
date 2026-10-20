@@ -52,7 +52,7 @@ export default async function SpkPage({ params }: { params: Promise<{ id: string
           <tr><th>Jadwal</th><td>: {fmtDate(q.startAt)} s/d {fmtDate(q.endAt)} Â· standby {q.standbyTime} WIB</td></tr>
           <tr><th>Titik jemput</th><td>: {q.pickupPoint} (koordinasi akses bus besar di H-1)</td></tr>
           <tr><th>Armada</th><td>: {q.unitCount}Ã— {type?.name}{holdRows.length > 0 ? ` (${holdRows.map((r) => r.plate).join(', ')})` : ''}</td></tr>
-          <tr><th>Pax</th><td>: {q.pax} orang{q.luggageNote ? ` Â· bagasi: ${q.luggageNote}` : ''}</td></tr>
+          {q.luggageNote ? <tr><th>Bagasi</th><td>: {q.luggageNote}</td></tr> : null}
         </tbody>
       </table>
 

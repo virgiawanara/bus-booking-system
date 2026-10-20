@@ -35,7 +35,6 @@ async function makeQuote(overrides: Partial<typeof quotes.$inferInsert> = {}) {
       standbyTime: '05.30',
       startAt: addDays(new Date(), 7),
       endAt: addDays(new Date(), 9),
-      pax: 10,
       unitCount: 1,
       typeId: (await db.select().from(unitTypes).limit(1))[0].id,
       estimate: 3_000_000,

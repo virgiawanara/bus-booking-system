@@ -14,7 +14,6 @@ const quoteInputSchema = z.object({
   standbyTime: z.string().regex(/^\d{1,2}\.\d{2}$/),
   startAt: z.coerce.date(),
   endAt: z.coerce.date(),
-  pax: z.number().int().min(1).max(200),
   luggageNote: z.string().max(400).nullish(),
   unitCount: z.number().int().min(1).max(10),
   typeId: z.number().int(),
@@ -29,7 +28,6 @@ export async function createQuote(db: DB, input: QuoteInput) {
 
   const [type] = await db.select().from(unitTypes).where(eq(unitTypes.id, data.typeId));
   if (!type || !type.active) throw new Error('Tipe unit tidak tersedia');
-  if (data.pax > type.seats * data.unitCount) throw new Error('Melebihi kapasitas armada');
 
   const phone = normalizePhone(data.phone);
   const est = computeEstimate({
@@ -51,7 +49,6 @@ export async function createQuote(db: DB, input: QuoteInput) {
       standbyTime: data.standbyTime,
       startAt: data.startAt,
       endAt: data.endAt,
-      pax: data.pax,
       luggageNote: data.luggageNote ?? null,
       unitCount: data.unitCount,
       typeId: data.typeId,

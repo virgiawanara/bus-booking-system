@@ -30,7 +30,6 @@ async function seedAndConfirmedOrder() {
     standbyTime: '05.30',
     startAt: start,
     endAt: addDays(start, 2),
-    pax: 30,
     unitCount: 1,
     typeId: t.id,
   });
@@ -82,7 +81,6 @@ describe('issueSpk', () => {
       standbyTime: '06.00',
       startAt: start,
       endAt: addDays(start, 1),
-      pax: 5,
       unitCount: 1,
       typeId: t.id,
     });

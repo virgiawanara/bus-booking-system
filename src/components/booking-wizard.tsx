@@ -11,7 +11,6 @@ type FormState = {
   destination: string;
   startDate: string; // yyyy-mm-dd
   endDate: string;
-  pax: number | null;
   unitCount: number;
   typeId: number | null;
   picName: string;
@@ -27,7 +26,6 @@ const initialState: FormState = {
   destination: '',
   startDate: '',
   endDate: '',
-  pax: null,
   unitCount: 1,
   typeId: null,
   picName: '',
@@ -57,8 +55,8 @@ export function BookingWizard() {
   const [result, setResult] = useState<QuoteResult | null>(null);
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));  async function checkAvailability() {
-    if (!form.origin.trim() || !form.destination.trim() || !form.startDate || !form.endDate || !form.pax) {
-      setError('Lengkapi rute, tanggal, dan jumlah penumpang');
+    if (!form.origin.trim() || !form.destination.trim() || !form.startDate || !form.endDate) {
+      setError('Lengkapi rute dan tanggal');
       return;
     }
     if (form.endDate < form.startDate) {
@@ -101,7 +99,6 @@ export function BookingWizard() {
         standbyTime: form.standbyTime.trim(),
         startAtISO: toISO(form.startDate),
         endAtISO: toISO(form.endDate),
-        pax: form.pax ?? 0,
         luggageNote: form.luggageNote || null,
         unitCount: form.unitCount,
         typeId: form.typeId,
@@ -123,7 +120,7 @@ export function BookingWizard() {
       <Card>
         <Stepper step={0} />
         <h2 className="mb-1 text-2xl font-extrabold tracking-tight">Rencana sewa Anda</h2>
-        <p className="mb-4 text-sm text-ink-soft">Rute, tanggal, dan jumlah rombongan.</p>
+        <p className="mb-4 text-sm text-ink-soft">Rute dan tanggal sewa.</p>
         <div className="grid gap-3">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Jemput dari">
@@ -142,18 +139,10 @@ export function BookingWizard() {
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Jumlah penumpang">
-              <Input
-                type="number"
-                min={1}
-                value={form.pax ?? ''}
-                onChange={(e) => set('pax', e.target.value ? Number(e.target.value) : null)}
-                placeholder="30"
-              />
-            </Field>
-            <Field label="Jumlah unit" hint="Bisa disesuaikan di langkah berikutnya">
+            <Field label="Jumlah unit">
               <Input type="number" min={1} max={10} value={form.unitCount} onChange={(e) => set('unitCount', Math.max(1, Number(e.target.value) || 1))} />
             </Field>
+            <div />
           </div>
           {error ? <p className="text-sm font-semibold text-danger">{error}</p> : null}
           <Button onClick={checkAvailability} loading={loading}>Cek ketersediaan</Button>
@@ -171,15 +160,11 @@ export function BookingWizard() {
         <div className="mb-4 grid gap-3">
           {types?.map((t) => {
             const selected = form.typeId === t.id;
-            const unitsNeeded = form.pax ? Math.max(form.unitCount, Math.ceil(form.pax / t.seats)) : form.unitCount;
             return (
               <button
                 key={t.id}
                 type="button"
-                onClick={() => {
-                  set('typeId', selected ? null : t.id);
-                  if (form.pax && !selected && t.seats * form.unitCount < form.pax) set('unitCount', unitsNeeded);
-                }}
+                onClick={() => set('typeId', selected ? null : t.id)}
                 className={cx('flex gap-4 rounded-[18px] border bg-white p-3 text-left transition', selected ? 'border-ink' : 'border-line hover:border-ink/30')}
               >
                 <img
@@ -190,7 +175,7 @@ export function BookingWizard() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="truncate font-bold">{t.name}</h3>
-                    {t.free >= unitsNeeded ? <Pill tone="ok">{t.free} unit tersedia</Pill> : <Pill tone="warn">Perlu konfirmasi admin</Pill>}
+                    {t.free >= form.unitCount ? <Pill tone="ok">{t.free} unit tersedia</Pill> : <Pill tone="warn">Perlu konfirmasi admin</Pill>}
                   </div>
                   <p className="mt-0.5 text-sm text-ink-soft">Mulai dari <b className="text-ink">{fmtIDR(t.ratePerDay)}</b>/hari · {t.total} unit</p>
                   <div className="mt-2 flex flex-wrap gap-1">

@@ -27,7 +27,7 @@ async function makeQuote(typeId: number, startAt: Date, endAt: Date, unitCount =
       code: `Q-AV-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       picName: 'P', phone: '6281', origin: 'A', destination: 'B',
       pickupPoint: 'X', standbyTime: '05.30',
-      startAt, endAt, pax: 5, unitCount, typeId,
+      startAt, endAt, unitCount, typeId,
       estimate: 3_000_000,
     })
     .returning();
