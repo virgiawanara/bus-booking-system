@@ -4,8 +4,9 @@ import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getDb, type DB } from '@/db';
-import { assignments, settings, unitTypes, units } from '@/db/schema';
+import { assignments, crew, settings, unitTypes, units } from '@/db/schema';
 import { requireAdmin, loginAdmin, logoutAdmin, allowLoginAttempt } from '@/lib/auth';
+import { normalizePhone } from '@/lib/wa-template';
 import { headers } from 'next/headers';
 import { holdQuote, extendHold, releaseHold, cancelQuote } from '@/lib/holds';
 import { verifyDpPayment, verifyPelunasanPayment } from '@/lib/payments';
@@ -69,7 +70,6 @@ export async function logoutAction(): Promise<void> {
 }
 
 export async function holdAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const unitIds = fd.getAll('unitIds').map((v) => Number(v)).filter(Number.isInteger);
   const settings = await guard(quoteId, () => getSettings());
@@ -84,7 +84,6 @@ export async function holdAction(fd: FormData): Promise<void> {
 }
 
 export async function extendAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () =>
     extendHold(getDb(), { quoteId, extraHours: num(fd, 'extraHours'), reason: s(fd, 'reason') }),
@@ -94,7 +93,6 @@ export async function extendAction(fd: FormData): Promise<void> {
 }
 
 export async function releaseAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () => releaseHold(getDb(), { quoteId }));
   if (!res.ok) back(quoteId, res.reason);
@@ -102,7 +100,6 @@ export async function releaseAction(fd: FormData): Promise<void> {
 }
 
 export async function cancelAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () => cancelQuote(getDb(), { quoteId }));
   if (!res.ok) back(quoteId, res.reason);
@@ -110,7 +107,6 @@ export async function cancelAction(fd: FormData): Promise<void> {
 }
 
 export async function verifyDpAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () =>
     verifyDpPayment(getDb(), {
@@ -125,7 +121,6 @@ export async function verifyDpAction(fd: FormData): Promise<void> {
 }
 
 export async function verifyPelunasanAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () =>
     verifyPelunasanPayment(getDb(), {
@@ -140,7 +135,6 @@ export async function verifyPelunasanAction(fd: FormData): Promise<void> {
 }
 
 export async function finalPriceAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () => setFinalPrice(getDb(), { quoteId, finalPrice: num(fd, 'finalPrice') }));
   if (!res.ok) back(quoteId, res.reason);
@@ -148,7 +142,6 @@ export async function finalPriceAction(fd: FormData): Promise<void> {
 }
 
 export async function spkAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () => issueSpk(getDb(), { quoteId }));
   if (!res.ok) back(quoteId, res.reason);
@@ -156,7 +149,6 @@ export async function spkAction(fd: FormData): Promise<void> {
 }
 
 export async function dispatchedAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const crewIds = fd.getAll('crewIds').map((v) => Number(v)).filter(Number.isInteger);
   if (crewIds.length === 0) back(quoteId, 'Pilih minimal 1 kru');
@@ -172,7 +164,6 @@ export async function dispatchedAction(fd: FormData): Promise<void> {
 }
 
 export async function completedAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () => markCompleted(getDb(), { quoteId }));
   if (!res.ok) back(quoteId, res.reason);
@@ -180,7 +171,6 @@ export async function completedAction(fd: FormData): Promise<void> {
 }
 
 export async function contactedAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   const res = await guard(quoteId, () => markContacted(getDb(), { quoteId }));
   if (!res.ok) back(quoteId, res.reason);
@@ -188,7 +178,6 @@ export async function contactedAction(fd: FormData): Promise<void> {
 }
 
 export async function feedbackTokenAction(fd: FormData): Promise<void> {
-  'use server';
   const quoteId = num(fd, 'quoteId');
   await guard(quoteId, () => ensureFeedbackToken(getDb(), { quoteId }));
   done(quoteId, 'Link feedback siap dikirim');
@@ -240,6 +229,35 @@ export async function toggleUnitAction(fd: FormData): Promise<void> {
   const active = s(fd, 'active') === '1';
   await getDb().update(units).set({ active }).where(eq(units.id, id));
   flushed('/admin/fleet', 'Unit diubah');
+}
+
+export async function saveCrewAction(fd: FormData): Promise<void> {
+  await requireAdmin();
+  const name = s(fd, 'name');
+  const role = s(fd, 'role');
+  let phone: string;
+  try {
+    phone = normalizePhone(s(fd, 'phone'));
+  } catch {
+    redirect('/admin/fleet?err=' + encodeURIComponent('Nomor WhatsApp kru tidak valid'));
+  }
+  if (!name || (role !== 'driver' && role !== 'co_driver')) {
+    redirect('/admin/fleet?err=' + encodeURIComponent('Nama atau role kru tidak valid'));
+  }
+  try {
+    await getDb().insert(crew).values({ name, phone, role });
+  } catch (e) {
+    redirect('/admin/fleet?err=' + encodeURIComponent(e instanceof Error ? e.message : String(e)));
+  }
+  flushed('/admin/fleet', 'Kru ditambahkan');
+}
+
+export async function toggleCrewAction(fd: FormData): Promise<void> {
+  await requireAdmin();
+  const id = num(fd, 'id');
+  const active = s(fd, 'active') === '1';
+  await getDb().update(crew).set({ active }).where(eq(crew.id, id));
+  flushed('/admin/fleet', 'Kru diubah');
 }
 
 export async function saveSettingsAction(fd: FormData): Promise<void> {

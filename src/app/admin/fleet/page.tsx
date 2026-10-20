@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { desc } from 'drizzle-orm';
 import { requireAdmin } from '@/lib/auth';
 import { getDb } from '@/db';
-import { unitTypes, units } from '@/db/schema';
-import { Card, Button, Input, Pill } from '@/components/ui';
+import { crew, unitTypes, units } from '@/db/schema';
+import { Card, Button, Input, Pill, Select } from '@/components/ui';
 import { fmtIDR } from '@/lib/format';
-import { saveUnitTypeAction, saveUnitAction, toggleUnitAction } from '@/app/admin-actions';
+import { saveUnitTypeAction, saveUnitAction, toggleUnitAction, saveCrewAction, toggleCrewAction } from '@/app/admin-actions';
 
 const CONTOH_WARN = 'âš ï¸ Tarif di bawah masih CONTOH â€” ganti dengan tarif asli PO sebelum dipakai!';
 
@@ -18,6 +18,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const db = getDb();
   const types = await db.select().from(unitTypes).orderBy(desc(unitTypes.active), unitTypes.seats);
   const allUnits = await db.select().from(units);
+  const crewRows = await db.select().from(crew).orderBy(desc(crew.active), crew.role, crew.name);
 
   return (
     <div className="grid gap-5">
@@ -86,6 +87,34 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           </Card>
         );
       })}
+
+      <Card>
+        <h2 className="mb-1 text-base font-bold">Kru — driver &amp; co-driver</h2>
+        <p className="mb-3 text-xs text-ink-soft">Dipakai di halaman SPK &amp; dispatch H-1. Klik kru untuk mengaktif/nonaktifkan.</p>
+        <div className="flex flex-wrap items-center gap-2">
+          {crewRows.map((c) => (
+            <form key={c.id} action={toggleCrewAction} className="flex items-center gap-1">
+              <input type="hidden" name="id" value={c.id} />
+              <input type="hidden" name="active" value={c.active ? '0' : '1'} />
+              <button
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold ${c.active ? 'bg-ok/10 text-ok' : 'bg-ink/5 text-ink-soft line-through'}`}
+              >
+                {c.name} · {c.role === 'co_driver' ? 'co-driver' : 'driver'}{c.active ? '' : ' (nonaktif)'}
+              </button>
+            </form>
+          ))}
+          {crewRows.length === 0 ? <p className="text-sm text-ink-soft">Belum ada kru.</p> : null}
+        </div>
+        <form action={saveCrewAction} className="mt-3 flex flex-wrap items-center gap-2">
+          <Input name="name" placeholder="Nama kru" className="!w-44" required />
+          <Input name="phone" placeholder="No. WA, mis. 0812-3456-7890" className="!w-56" required />
+          <Select name="role" defaultValue="driver" className="!w-36">
+            <option value="driver">Driver</option>
+            <option value="co_driver">Co-driver</option>
+          </Select>
+          <Button type="submit" variant="ghost">Tambah kru</Button>
+        </form>
+      </Card>
 
       <Card>
         <h2 className="mb-2 text-base font-bold">Tambah tipe baru</h2>
