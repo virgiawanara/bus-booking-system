@@ -10,9 +10,7 @@ type FormState = {
   origin: string;
   destination: string;
   startDate: string; // yyyy-mm-dd
-  startTime: string; // HH.mm
   endDate: string;
-  endTime: string;
   pax: number | null;
   unitCount: number;
   typeId: number | null;
@@ -28,9 +26,7 @@ const initialState: FormState = {
   origin: '',
   destination: '',
   startDate: '',
-  startTime: '05.30',
   endDate: '',
-  endTime: '18.00',
   pax: null,
   unitCount: 1,
   typeId: null,
@@ -42,10 +38,10 @@ const initialState: FormState = {
   notes: '',
 };
 
-function toISO(date: string, time: string): string {
-  if (!date || !time) return '';
-  const [h = '0', m = '0'] = time.split('.').map((x) => x.padStart(2, '0'));
-  return `${date}T${h.padStart(2, '0')}:${m.padStart(2, '0')}:00+07:00`;
+// Date-only: startAt/endAt tetap tersimpan sebagai ISO; midnight WIB.
+// Duraion dihitung di estimate (tanggal sama = 1 hari).
+function toISO(date: string): string {
+  return date ? `${date}T00:00:00+07:00` : '';
 }
 
 function fmtIDR(n: number) {
@@ -65,10 +61,14 @@ export function BookingWizard() {
       setError('Lengkapi rute, tanggal, dan jumlah penumpang');
       return;
     }
+    if (form.endDate < form.startDate) {
+      setError('Tanggal kembali tidak boleh sebelum tanggal berangkat');
+      return;
+    }
     try {
       setError(null);
       setLoading(true);
-      const res = await checkAvailabilityAction(toISO(form.startDate, form.startTime), toISO(form.endDate, form.endTime));
+      const res = await checkAvailabilityAction(toISO(form.startDate), toISO(form.endDate));
       if ('error' in res) {
         setError(res.error);
         return;
@@ -85,6 +85,10 @@ export function BookingWizard() {
       setError('Lengkapi data kontak dan titik jemput');
       return;
     }
+    if (!/^\d{1,2}\.\d{2}$/.test(form.standbyTime.trim())) {
+      setError('Isi waktu standby armada, mis. 05.30');
+      return;
+    }
     try {
       setError(null);
       setLoading(true);
@@ -94,9 +98,9 @@ export function BookingWizard() {
         origin: form.origin,
         destination: form.destination,
         pickupPoint: form.pickupPoint,
-        standbyTime: form.standbyTime.trim() || form.startTime,
-        startAtISO: toISO(form.startDate, form.startTime),
-        endAtISO: toISO(form.endDate, form.endTime),
+        standbyTime: form.standbyTime.trim(),
+        startAtISO: toISO(form.startDate),
+        endAtISO: toISO(form.endDate),
         pax: form.pax ?? 0,
         luggageNote: form.luggageNote || null,
         unitCount: form.unitCount,
@@ -131,16 +135,10 @@ export function BookingWizard() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Berangkat">
-              <div className="flex gap-2">
-                <Input type="date" value={form.startDate} onChange={(e) => set('startDate', e.target.value)} />
-                <Input value={form.startTime} onChange={(e) => set('startTime', e.target.value)} placeholder="05.30" />
-              </div>
+              <Input type="date" value={form.startDate} onChange={(e) => set('startDate', e.target.value)} />
             </Field>
             <Field label="Kembali">
-              <div className="flex gap-2">
-                <Input type="date" value={form.endDate} onChange={(e) => set('endDate', e.target.value)} />
-                <Input value={form.endTime} onChange={(e) => set('endTime', e.target.value)} placeholder="18.00" />
-              </div>
+              <Input type="date" value={form.endDate} onChange={(e) => set('endDate', e.target.value)} />
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -233,8 +231,8 @@ export function BookingWizard() {
             <Input value={form.pickupPoint} onChange={(e) => set('pickupPoint', e.target.value)} placeholder="Area Parkir Gedung Graha Mandiri, Cilandak" />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Waktu standby armada" hint="Kosongkan = ikut jam berangkat">
-              <Input value={form.standbyTime} onChange={(e) => set('standbyTime', e.target.value)} placeholder={form.startTime} />
+            <Field label="Waktu standby armada" hint="Jam armada siap di titik jemput, mis. 05.30">
+              <Input value={form.standbyTime} onChange={(e) => set('standbyTime', e.target.value)} placeholder="05.30" />
             </Field>
             <Field label="Jumlah unit">
               <Input type="number" min={1} max={10} value={form.unitCount} onChange={(e) => set('unitCount', Math.max(1, Number(e.target.value) || 1))} />

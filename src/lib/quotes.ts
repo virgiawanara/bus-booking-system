@@ -25,7 +25,7 @@ export type QuoteInput = z.input<typeof quoteInputSchema>;
 
 export async function createQuote(db: DB, input: QuoteInput) {
   const data = quoteInputSchema.parse(input);
-  if (!(data.endAt.getTime() > data.startAt.getTime())) throw new Error('Rentang waktu tidak valid');
+  if (data.endAt.getTime() < data.startAt.getTime()) throw new Error('Tanggal kembali lebih awal dari tanggal berangkat');
 
   const [type] = await db.select().from(unitTypes).where(eq(unitTypes.id, data.typeId));
   if (!type || !type.active) throw new Error('Tipe unit tidak tersedia');

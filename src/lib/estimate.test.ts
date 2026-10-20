@@ -29,12 +29,15 @@ describe('computeEstimate', () => {
     expect(est.total).toBe(9_000_000);
   });
 
-  it('menolak rentang kosong/bolak-balik', () => {
+  it('sewa sehari (berangkat = kembali) dihitung 1 hari', () => {
+    const est = computeEstimate({ startAt: start, endAt: start, ratePerDay: 1_500_000, unitCount: 1 });
+    expect(est.days).toBe(1);
+    expect(est.total).toBe(1_500_000);
+  });
+
+  it('menolak rentang bolak-balik', () => {
     expect(() =>
       computeEstimate({ startAt: end63h, endAt: start, ratePerDay: 1_500_000, unitCount: 1 }),
-    ).toThrow();
-    expect(() =>
-      computeEstimate({ startAt: start, endAt: start, ratePerDay: 1_500_000, unitCount: 1 }),
     ).toThrow();
   });
 

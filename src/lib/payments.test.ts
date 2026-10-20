@@ -61,13 +61,20 @@ describe('createQuote', () => {
     await expect(createQuote(db, baseInput({ typeId: t.id, pax: 50 }))).rejects.toThrow(/kapasitas/i);
   });
 
-  it('unit tidak positif / rentang aneh ditolak', async () => {
+  it('unit tidak positif / tanggal kembali lebih awal ditolak', async () => {
     const { t } = await seedOneUnit();
     await expect(createQuote(db, baseInput({ typeId: t.id, unitCount: 0 }))).rejects.toThrow();
     const start = addDays(new Date(), 7);
     await expect(
-      createQuote(db, baseInput({ typeId: t.id, startAt: start, endAt: start })),
+      createQuote(db, baseInput({ typeId: t.id, startAt: start, endAt: addDays(start, -1) })),
     ).rejects.toThrow();
+  });
+
+  it('sewa sehari (kembali = berangkat) legal, dihitung 1 hari', async () => {
+    const { t } = await seedOneUnit();
+    const start = addDays(new Date(), 7);
+    const q = await createQuote(db, baseInput({ typeId: t.id, startAt: start, endAt: start }));
+    expect(q.estimate).toBe(1_500_000);
   });
 
   it('nomor WA tidak valid ditolak', async () => {

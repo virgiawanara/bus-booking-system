@@ -6,7 +6,7 @@ import { requireAdmin } from '@/lib/auth';
 import { getDb } from '@/db';
 import { dispatchDue } from '@/lib/admin-data';
 import { Card, Pill } from '@/components/ui';
-import { fmtDateTime } from '@/lib/format';
+import { fmtDate } from '@/lib/format';
 
 export default async function DispatchPage() {
   await requireAdmin();
@@ -41,7 +41,7 @@ export default async function DispatchPage() {
                     {q.picName} Â· {q.pickupPoint}
                   </p>
                   <p className="text-[13px] text-ink-soft">
-                    Berangkat {fmtDateTime(q.startAt)} Â· {q.unitCount}Ã— {typeName} Â· {q.pax} pax
+                    Berangkat {fmtDate(q.startAt)} Â· {q.unitCount}Ã— {typeName} Â· {q.pax} pax
                   </p>
                 </div>
                 <span className="text-xs font-semibold text-ink-soft">Standby {q.standbyTime} WIB</span>
